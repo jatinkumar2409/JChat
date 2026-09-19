@@ -1,51 +1,53 @@
+import { FirebaseAuthManager } from "@/core/firebase/FirebaseAuthManager";
 import { UserDTO } from "@/core/models/User";
-import {AuthRepo} from "../repo/AuthRepo";
 import { User } from "firebase/auth";
-import { BACKEND_URL } from "../../../../config";
+import { AuthRepo } from "../repo/AuthRepo";
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    const firebaseError = error as Error & { code?: string };
+    return firebaseError.code
+      ? `${firebaseError.code}: ${firebaseError.message}`
+      : firebaseError.message;
+  }
+
+  return typeof error === "string" ? error : "An unexpected error occurred";
+}
+
 export class AuthService{
     private authRepo : AuthRepo
-    constructor(authRepo : AuthRepo){
+    private firebaseAuthManager : FirebaseAuthManager
+    constructor(authRepo : AuthRepo , firebaseAuthManager : FirebaseAuthManager){
       this.authRepo = authRepo
+      this.firebaseAuthManager = firebaseAuthManager
     }
-    async createAccount(name : string , email : string , password : string , onSuccess : () => void , onFailure : (error : string)=> void){
+    async createAccount(name : string, userName : string , email : string , password : string , onSuccess : () => void , onFailure : (error : string)=> void){
        try{
-         const fbUser : User = await this.authRepo.signUp(name , email , password);
+         const isUserNameUnique = await this.authRepo.checkIfUsernameIsUnique(userName);
+         if(!isUserNameUnique){
+          onFailure("Username is not unique");
+          return;
+         }
+         const fbUser : User = await this.firebaseAuthManager.createAccount(name , email , password);
          const user : UserDTO ={
-             userId : fbUser.uid , name  :fbUser.displayName ?? name , email: fbUser.email ?? email ,about: ""
+             userId : fbUser.uid , userName : userName , profilePicture : fbUser.photoURL?? "" , name  :fbUser.displayName ?? name , email: fbUser.email ?? email ,about: ""
          }
-         const res = await fetch(`${BACKEND_URL}/addUser` , {
-            method : "POST" ,
-             headers: {
-        "Content-Type": "application/json",
-    },
-            body : JSON.stringify(user)
-         })
-         console.log(res.status);
-         if(res.ok){
-            onSuccess();
-         }
+         await this.authRepo.addUser(user);
+         onSuccess();
        }catch(e : unknown){
-           if (e instanceof Error) {
-    console.error("Error message:", e.message);
-          onFailure(e.message);
-  } else {
-    console.error("An unexpected error occurred:", e);
-    onFailure("An unexpected error occurred");
-  }
+          const message = getErrorMessage(e);
+          console.error("Authentication error:", e);
+          onFailure(message);
        }
     }
     async logIn(email : string , password : string , onSuccess : () => void , onFailure : (error : string)=> void){
        try{
-         const fbUser : User = await this.authRepo.signIn( email , password);
+          await this.firebaseAuthManager.signIn( email , password);
          onSuccess();
        }catch(e : unknown){
-           if (e instanceof Error) {
-    console.error("Error message:", e.message);
-          onFailure(e.message);
-  } else {
-    console.error("An unexpected error occurred:", e);
-    onFailure("An unexpected error occurred");
-  }
+          const message = getErrorMessage(e);
+          console.error("Authentication error:", e);
+          onFailure(message);
        }
     }
 }

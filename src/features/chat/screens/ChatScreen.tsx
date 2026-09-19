@@ -1,11 +1,11 @@
 import { Text } from "expo-router/build/react-navigation"
 
-function MainScreen() {
+function ChatScreen() {
   return (
     <Text>
-        Hello World
+        
     </Text>
   )
 }
 
-export default MainScreen
+export default ChatScreen

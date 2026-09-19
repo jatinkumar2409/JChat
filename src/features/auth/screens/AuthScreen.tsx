@@ -20,14 +20,14 @@ const PrimaryTheme = {
   primary60: "#0B8BF4",
 };
 
-export default function AuthScreen({ navigation }: any) {
+export default function AuthScreen(navigateToHome : () => void) {
   const authService = container.authService;  
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading , setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [userName , setUserName] = useState("");
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
@@ -43,11 +43,11 @@ export default function AuthScreen({ navigation }: any) {
   const handleSubmit = async () => {
   
     if (!isLogin) {
-        if(email.trim().length == 0 || password.trim().length == 0 || name.trim().length == 0){
+        if(email.trim().length == 0 || password.trim().length == 0 || name.trim().length == 0 || userName.trim().length == 0){
             return
         }
         setIsLoading(true);
-        await authService.createAccount(name , email , password , () => {
+        await authService.createAccount(name , userName , email , password , () => {
           Toast.show({
             type : "success",
             text1 : "Welcome " + name + "!"
@@ -56,7 +56,7 @@ export default function AuthScreen({ navigation }: any) {
           setName("");
           setEmail("");
           setPassword("");
-          navigation.navigate('BottomNav')
+          navigateToHome();
         }, (message) =>{
              Toast.show({
               type : "error" ,
@@ -82,7 +82,7 @@ export default function AuthScreen({ navigation }: any) {
           setIsLoading(false);
           setEmail("");
           setPassword("");
-          navigation.navigate('BottomNav')
+          navigateToHome();
         } , function(e){
           Toast.show({
               type : "error" ,
@@ -159,6 +159,35 @@ export default function AuthScreen({ navigation }: any) {
                   value={name}
                   onChangeText={setName}
                   placeholder="Enter your name"
+                  placeholderTextColor={colors.secondaryText}
+                  style={[
+                    styles.input,
+                    {
+                      color: colors.text,
+                      backgroundColor: colors.inputBackground,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  autoCapitalize="words"
+                />
+              </View>
+            )}
+
+            {!isLogin && (
+              <View style={styles.inputContainer}>
+                <Text
+                  style={[
+                    styles.label,
+                    { color: colors.text },
+                  ]}
+                >
+                  Name
+                </Text>
+
+                <TextInput
+                  value={userName}
+                  onChangeText={setUserName}
+                  placeholder="Enter your unique Username"
                   placeholderTextColor={colors.secondaryText}
                   style={[
                     styles.input,
