@@ -1,3 +1,5 @@
+import { ConversationType } from "./Conversation";
+
 export type MessageType =
   | "TEXT";
 
@@ -13,9 +15,21 @@ export interface MessageMetadata {
   senderId: string;
   type: MessageType;
   message: Message;
-  sentAt: number;
+  sentAt?: number | null;
   deletedAt?: number | null;
   version: number;
+}
+
+export interface FirstMessageMetadata{
+  messageId: string;
+  conversationId: string;
+  senderId: string;
+  type: MessageType;
+  message: Message;
+  sentAt?: number | null;
+  deletedAt?: number | null;
+  version: number;
+  receiverId : string
 }
 
 export interface MessageReceiver {

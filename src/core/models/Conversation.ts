@@ -8,7 +8,7 @@ export interface Conversation {
   name: string;
   profileUrl: string;
   membersCount: number;
-  createdAt: number;
+  createdAt?: number | null;
   firstMemberId?: string | null;
   secondMemberId?: string | null;
   creatorId?: string | null;

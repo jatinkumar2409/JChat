@@ -17,13 +17,15 @@ export const conversations = sqliteTable("conversations", {
 
   membersCount: integer("members_count").notNull(),
 
-  createdAt: integer("created_at").notNull(),
+  createdAt: integer("created_at"),
 
   firstMemberId: text("first_member_id"),
 
   secondMemberId: text("second_member_id"),
 
   creatorId: text("creator_id"),
+
+
 });
 
 
@@ -64,8 +66,7 @@ export const messageMetadata = sqliteTable("message_metadata", {
    */
   message: text("message").notNull(),
 
-  sentAt: integer("sent_at").notNull(),
-
+  sentAt: integer("sent_at"),
   deletedAt: integer("deleted_at"),
 
   version: integer("version").notNull().default(1),

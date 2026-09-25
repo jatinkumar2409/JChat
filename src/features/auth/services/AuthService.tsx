@@ -3,17 +3,6 @@ import { UserDTO } from "@/core/models/User";
 import { User } from "firebase/auth";
 import { AuthRepo } from "../repo/AuthRepo";
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    const firebaseError = error as Error & { code?: string };
-    return firebaseError.code
-      ? `${firebaseError.code}: ${firebaseError.message}`
-      : firebaseError.message;
-  }
-
-  return typeof error === "string" ? error : "An unexpected error occurred";
-}
-
 export class AuthService{
     private authRepo : AuthRepo
     private firebaseAuthManager : FirebaseAuthManager
@@ -35,9 +24,7 @@ export class AuthService{
          await this.authRepo.addUser(user);
          onSuccess();
        }catch(e : unknown){
-          const message = getErrorMessage(e);
-          console.error("Authentication error:", e);
-          onFailure(message);
+           onFailure(e instanceof Error ? e.message : String(e));
        }
     }
     async logIn(email : string , password : string , onSuccess : () => void , onFailure : (error : string)=> void){
@@ -45,9 +32,7 @@ export class AuthService{
           await this.firebaseAuthManager.signIn( email , password);
          onSuccess();
        }catch(e : unknown){
-          const message = getErrorMessage(e);
-          console.error("Authentication error:", e);
-          onFailure(message);
+           onFailure(e instanceof Error ? e.message : String(e));
        }
     }
 }

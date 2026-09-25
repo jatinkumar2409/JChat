@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ActivityIndicator } from "react-native";
+import { PrimaryTheme , getColors } from "@/core/theme/Theme"; 
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,11 +15,6 @@ import {
 import Toast from "react-native-toast-message";
 import { container } from "../container";
 
-const PrimaryTheme = {
-  primary20: "#8FCAFA",
-  primary40: "#2798F5",
-  primary60: "#0B8BF4",
-};
 
 export default function AuthScreen(navigateToHome : () => void) {
   const authService = container.authService;  
@@ -31,14 +27,7 @@ export default function AuthScreen(navigateToHome : () => void) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const colors = {
-    background: isDark ? "#0D1117" : "#F8FAFC",
-    surface: isDark ? "#161B22" : "#FFFFFF",
-    text: isDark ? "#F0F6FC" : "#111827",
-    secondaryText: isDark ? "#8B949E" : "#6B7280",
-    border: isDark ? "#30363D" : "#D1D5DB",
-    inputBackground: isDark ? "#0D1117" : "#F9FAFB",
-  };
+  const colors = getColors(isDark);
 
   const handleSubmit = async () => {
   

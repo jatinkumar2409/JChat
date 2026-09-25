@@ -1,11 +1,12 @@
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useColorScheme } from "react-native";
-
+import { webSocketManager } from "@/core/websockets/WebSocketManager";
+import { BACKEND_URL } from "../../../config";
 export default function BottomNavLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-
+  webSocketManager.connect(`${BACKEND_URL}/ws`);
   return (
     <Tabs
       screenOptions={{
